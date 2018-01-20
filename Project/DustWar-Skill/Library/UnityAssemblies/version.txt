@@ -1,5 +1,5 @@
 2017.1.0f3:2.3.0.0
-StandaloneWindows64
+StandaloneWindows
 D:/Software_Work/Unity/Editor/Data/Managed/UnityEditor.dll
 D:/Software_Work/Unity/Editor/Data/Managed/UnityEngine.dll
 D:/Software_Work/Unity/Editor/Data/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll
