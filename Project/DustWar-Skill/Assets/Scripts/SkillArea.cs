@@ -25,14 +25,14 @@ public class SkillArea : MonoBehaviour {
 
     public GameObject player;      
 
-    public SkillAreaType areaType;      // 设置指示器类型
+    private SkillAreaType areaType;      // 设置指示器类型
 
-    Vector3 deltaVec;
+    internal Vector3 deltaVec;
 
-    float outerRadius = 6;      // 外圆半径
-    float innerRadius = 2f;     // 内圆半径
-    float cubeWidth = 2f;       // 矩形宽度 （矩形长度使用的外圆半径）
-    int angle = 60;             // 扇形角度
+    public float outerRadius = 6f;      // 外圆半径
+    public float innerRadius = 2f;     // 内圆半径
+    public float cubeWidth = 2f;       // 矩形宽度 （矩形长度使用的外圆半径）
+    public int angle = 60;             // 扇形角度
 
     bool isPressed = false;
 
@@ -50,7 +50,7 @@ public class SkillArea : MonoBehaviour {
     void Start()
     {
         skill = GetComponent<SkillController>();
-
+        areaType = skill.SkillType;
         skill.showSkill += Show;
         skill.moveSkill += Move;
         skill.hideSkill += Hide;
@@ -103,6 +103,7 @@ public class SkillArea : MonoBehaviour {
 
     void LateUpdate()
     {
+        areaType = GetComponent<SkillController>().SkillType;
         if(isPressed)
             UpdateElement();
     }
@@ -182,11 +183,11 @@ public class SkillArea : MonoBehaviour {
     /// <returns></returns>
     Transform GetParent()
     {
-        if (elementParent == null)
+        if (elementParent != null)
         {
             elementParent = player.transform.Find("SkillArea");
         }
-        if (elementParent == null)
+         else if (elementParent == null)
         {
             elementParent = new GameObject("SkillArea").transform;
             elementParent.parent = player.transform;
@@ -307,23 +308,19 @@ public class SkillArea : MonoBehaviour {
     }
 
     /// <summary>
-    /// 获取InnerCircle元素位置
+    /// 获取InnerCircle元素位置（改动）
     /// </summary>
     /// <returns></returns>
     Vector3 GetCirclePosition(float dist)
     {
         if (player == null) return Vector3.zero;
 
-        Vector3 targetDir = deltaVec * dist;
-
-        float y = Camera.main.transform.rotation.eulerAngles.y;
-        targetDir = Quaternion.Euler(0, y, 0) * targetDir;
-
+        Vector3 targetDir = deltaVec;
         return targetDir + player.transform.position;
     }
 
     /// <summary>
-    /// 获取Cube、Sector元素朝向
+    /// 获取Cube、Sector元素朝向（改动）
     /// </summary>
     /// <returns></returns>
     Vector3 GetCubeSectorLookAt()
@@ -331,10 +328,6 @@ public class SkillArea : MonoBehaviour {
         if (player == null) return Vector3.zero;
         
         Vector3 targetDir = deltaVec;
-
-        float y = Camera.main.transform.rotation.eulerAngles.y;
-        targetDir = Quaternion.Euler(0, y, 0) * targetDir;
-
         return targetDir + player.transform.position;
     }
 }
