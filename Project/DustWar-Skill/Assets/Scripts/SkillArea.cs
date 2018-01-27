@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
-
+/// <summary>
+/// 技能指示器类型枚举
+/// </summary>
 public enum SkillAreaType
 {
     OuterCircle = 0,
@@ -12,52 +14,121 @@ public enum SkillAreaType
 
 public class SkillArea : MonoBehaviour {
 
+    /// <summary>
+    /// 技能指示器元素（技能指示器组件）枚举
+    /// </summary>
     enum SKillAreaElement
     {
-        OuterCircle,    // 外圆
-        InnerCircle,    // 内圆
-        Cube,           // 矩形 
-        Sector60,        // 扇形
-        Sector120,        // 扇形
+        /// <summary>
+        /// 外圆
+        /// </summary>
+        OuterCircle,   
+        /// <summary>
+        /// 内圆
+        /// </summary>
+        InnerCircle,   
+        /// <summary>
+        /// 矩形 
+        /// </summary>
+        Cube,   
+        /// <summary>
+        /// 扇形
+        /// </summary>
+        Sector60,        
+        /// <summary>
+        /// 扇形
+        /// </summary>
+        Sector120,       
     }
-
+    /// <summary>
+    /// 技能控制类
+    /// </summary>
     SkillController skill;
-
+    /// <summary>
+    /// 玩家（角色）
+    /// </summary>
     public GameObject player;      
+    /// <summary>
+    /// 设置指示器类型
+    /// </summary>
+    private SkillAreaType areaType;
 
-    private SkillAreaType areaType;      // 设置指示器类型
-
+    /// <summary>
+    /// 技能指示器的位置
+    /// </summary>
     internal Vector3 deltaVec;
 
-    public float outerRadius = 6f;      // 外圆半径
-    public float innerRadius = 2f;     // 内圆半径
-    public float cubeWidth = 2f;       // 矩形宽度 （矩形长度使用的外圆半径）
-    public int angle = 60;             // 扇形角度
+    /// <summary>
+    /// 外圆半径
+    /// </summary>
+    public float outerRadius = 6f;      
+    /// <summary>
+    /// 内圆半径
+    /// </summary>
+    public float innerRadius = 2f;  
+    /// <summary>
+    /// 矩形宽度 （矩形长度使用的外圆半径）
+    /// </summary>
+    public float cubeWidth = 2f;       
+    /// <summary>
+    /// 扇形角度
+    /// </summary>
+    public int angle = 60;
+    /// <summary>
+    /// 技能是否启用的标识（是否摁下技能）
+    /// </summary>
+    public bool isPressed = false;
 
-    bool isPressed = false;
+    /// <summary>
+    /// 路径
+    /// </summary>
+    string path = "Effect/Prefabs/Hero_skillarea/";  
+    /// <summary>
+    /// 圆形
+    /// </summary>
+    string circle = "quan_hero";    
+    /// <summary>
+    /// 矩形
+    /// </summary>
+    string cube = "chang_hero";   
+    /// <summary>
+    /// 扇形60度
+    /// </summary>
+    string sector60 = "shan_hero_60";
+    /// <summary>
+    /// 扇形120度
+    /// </summary>
+    string sector120 = "shan_hero_120";    
 
-
-    string path = "Effect/Prefabs/Hero_skillarea/";  // 路径
-    string circle = "quan_hero";    // 圆形
-    string cube = "chang_hero";     // 矩形
-    string sector60 = "shan_hero_60";    // 扇形60度
-    string sector120 = "shan_hero_120";    // 扇形120度
-
+    /// <summary>
+    /// 所有技能指示器对应的路径（这里是除了基本目录之外的部分，即可理解为文件名）
+    /// </summary>
     Dictionary<SKillAreaElement, string> allElementPath;
+    /// <summary>
+    /// 所有技能指示器对应的Transform
+    /// </summary>
     Dictionary<SKillAreaElement, Transform> allElementTrans;
 
-    // Use this for initialization
+    /// <summary>
+    /// 程序开始执行的方法(优先级：0)
+    /// </summary>
     void Start()
     {
+        //实例化技能控制器类
         skill = GetComponent<SkillController>();
+        //获取技能指示器类型
         areaType = skill.SkillType;
+        //绑定事件
         skill.showSkill += Show;
         skill.moveSkill += Move;
         skill.hideSkill += Hide;
-
+        //初始化技能指示器（添加对应指示器范围类型的Path和Transform）
         InitSkillAreaType();
     }
 
+    /// <summary>
+    /// 销毁事件
+    /// </summary>
     void OnDestroy()
     {
         skill.showSkill -= Show;
@@ -65,15 +136,19 @@ public class SkillArea : MonoBehaviour {
         skill.hideSkill -= Hide;
     }
 
+    /// <summary>
+    /// 初始化技能指示器
+    /// </summary>
     void InitSkillAreaType()
     {
+        //添加对应指示器范围类型的Path
         allElementPath = new Dictionary<SKillAreaElement, string>();
         allElementPath.Add(SKillAreaElement.OuterCircle, circle);
         allElementPath.Add(SKillAreaElement.InnerCircle, circle);
         allElementPath.Add(SKillAreaElement.Cube, cube);
         allElementPath.Add(SKillAreaElement.Sector60, sector60);
         allElementPath.Add(SKillAreaElement.Sector120, sector120);
-
+        //添加对应指示器范围类型的Transform，初始化时为实际生成对象，所以Transform为null
         allElementTrans = new Dictionary<SKillAreaElement, Transform>();
         allElementTrans.Add(SKillAreaElement.OuterCircle, null);
         allElementTrans.Add(SKillAreaElement.InnerCircle, null);
@@ -82,28 +157,46 @@ public class SkillArea : MonoBehaviour {
         allElementTrans.Add(SKillAreaElement.Sector120, null);
     }
 
-
+    /// <summary>
+    /// 显示技能指示器的方法
+    /// </summary>
+    /// <param name="deltaVec">技能指示器的平面位置</param>
     void Show(Vector2 deltaVec)
     {
+        //技能启用标识设置为true
         isPressed = true;
+        //通过传入的的技能指示器平面坐标生成三维坐标
         this.deltaVec = new Vector3(deltaVec.x, 0, deltaVec.y);
+        //创建技能指示器
         CreateSkillArea();
     }
-
+    /// <summary>
+    /// 隐藏技能指示器的方法
+    /// </summary>
     void Hide()
     {
+        //技能启用标识设置为false
         isPressed = false;
+        //隐藏技能指示器
         HideElements();
     }
-
+    /// <summary>
+    /// 移动技能指示器方法
+    /// </summary>
+    /// <param name="deltaVec"></param>
     void Move(Vector2 deltaVec)
     {
+        //设置技能指示器位置
         this.deltaVec = new Vector3(deltaVec.x, 0, deltaVec.y);
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
     void LateUpdate()
     {
+        //获取技能指示器类型
         areaType = GetComponent<SkillController>().SkillType;
+        //技能启用标识为true才实时更新技能位置
         if(isPressed)
             UpdateElement();
     }
@@ -113,6 +206,7 @@ public class SkillArea : MonoBehaviour {
     /// </summary>
     void CreateSkillArea()
     {
+        //通过区分不同的指示器元素类型创建技能指示器
         switch (areaType)
         {
             case SkillAreaType.OuterCircle:
@@ -121,7 +215,7 @@ public class SkillArea : MonoBehaviour {
             case SkillAreaType.OuterCircle_InnerCube:
                 CreateElement(SKillAreaElement.OuterCircle);
                 CreateElement(SKillAreaElement.Cube);
-                HideElement(SKillAreaElement.OuterCircle);
+                //HideElement(SKillAreaElement.OuterCircle);
                 break;
             case SkillAreaType.OuterCircle_InnerSector:
                 CreateElement(SKillAreaElement.OuterCircle);
@@ -279,7 +373,22 @@ public class SkillArea : MonoBehaviour {
                 break;
         }
     }
-
+    void MouseDownAndCleanSkill(SKillAreaElement element)
+    {
+        switch (element)
+        {
+            case SKillAreaElement.OuterCircle:
+                break;
+            case SKillAreaElement.InnerCircle:
+                break;
+            case SKillAreaElement.Cube:
+            case SKillAreaElement.Sector60:
+            case SKillAreaElement.Sector120:
+                break;
+            default:
+                break;
+        }
+    }
     /// <summary>
     /// 每帧更新元素位置
     /// </summary>

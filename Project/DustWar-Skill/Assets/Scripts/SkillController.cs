@@ -7,23 +7,24 @@ using System;
 
 public class SkillController : MonoBehaviour
 {
-    #region 技能指示器代码改动部分
+    bool isSkill = false;
+
     List<Transform> Trigers = new List<Transform>(); 
     List<GameObject> EnemysInSkill = new List<GameObject>();
     public SkillAreaType SkillType;
     private SkillArea SkillAreaParam;
-    #endregion
+
     public float outerCircleRadius = 12f;
     Transform innerCircleTrans;
     //Vector2 outerCircleStartWorldPos = Vector2.zero;
 
+    //委托定义
     public Action<Vector2> showSkill;
     public Action hideSkill;
     public Action<Vector2> moveSkill;
     void Awake()
     {
         innerCircleTrans = transform.GetChild(0);
-        
         Trigers.Add (transform.GetChild(1));
         Trigers.Add  (transform.GetChild(2));
     }
@@ -36,9 +37,10 @@ public class SkillController : MonoBehaviour
     }
     void Update()
     {
-        if (Input.GetKey(KeyCode.Q))
+        //检测输入，变更isSkill
+        SkillInputCheck();
+        if (isSkill)
         {
-#region 技能指示器代码改动部分
             int layerMask = 1 << 8;
             layerMask = ~layerMask;
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -55,21 +57,26 @@ public class SkillController : MonoBehaviour
 
             if (moveSkill != null)
                 moveSkill(innerCircleTrans.localPosition);
-#endregion
+
             //技能检测前触开始发器设置
             SkillCheckStart(SkillType);
         }
-        if (Input.GetKeyUp(KeyCode.Q))
+        else
         {
-            innerCircleTrans.localPosition = Vector3.zero;
+            if (isSkill)
+            {
+                isSkill = false;
+                innerCircleTrans.localPosition = Vector3.zero;
+            }
+
             if (hideSkill != null)
                 hideSkill();
-            //技能触发
-            SkillCheckTrigger();
         }
-
     }
-    //技能开始检测，根据技能类型设置触发器大小和位置
+   /// <summary>
+   ///技能开始检测，根据技能类型设置触发器大小和位置
+   /// </summary>
+   /// <param name="checkMode">技能类型</param>
     void SkillCheckStart(SkillAreaType checkMode)
     {
         switch (checkMode)
@@ -87,7 +94,7 @@ public class SkillController : MonoBehaviour
             case SkillAreaType.OuterCircle_InnerSector:
                 Trigers[0].gameObject.SetActive(true);
                 Trigers[0].position = transform.position;
-                Trigers[0].localScale=new Vector3(SkillAreaParam.outerRadius,0,SkillAreaParam.outerRadius);
+                Trigers[0].localScale = new Vector3(SkillAreaParam.outerRadius, 0, SkillAreaParam.outerRadius);
                 break;
         }
     }
@@ -147,5 +154,20 @@ public class SkillController : MonoBehaviour
         //退出碰撞器的移出列表
         EnemysInSkill.Remove(col.gameObject);
     }
- 
+    /// <summary>
+    /// 输入检测并执行部分检测后的操作
+    /// </summary>
+    void SkillInputCheck()
+    { 
+        if (Input.GetKeyDown(KeyCode.Q)) 
+        {
+            isSkill = !isSkill;
+        }
+        else if (Input.GetKeyDown(KeyCode.Mouse0) && isSkill)
+        {
+            isSkill = !isSkill;
+            //触发检测
+            SkillCheckTrigger();
+        }
+    }
 }
