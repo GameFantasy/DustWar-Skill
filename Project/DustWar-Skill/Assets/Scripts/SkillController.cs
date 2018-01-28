@@ -96,6 +96,15 @@ public class SkillController : MonoBehaviour
                 Trigers[0].position = transform.position;
                 Trigers[0].localScale = new Vector3(SkillAreaParam.outerRadius, 0, SkillAreaParam.outerRadius);
                 break;
+            case SkillAreaType.OuterCircle_InnerCube:
+                Trigers[1].gameObject.SetActive(true);
+                BoxCollider boxCol = Trigers[1].GetComponent<BoxCollider>();
+                boxCol.size = new Vector3(1, 1, SkillAreaParam.outerRadius/2);
+                boxCol.center = new Vector3(0, 0, SkillAreaParam.outerRadius/4);
+                Trigers[0].localScale = new Vector3(SkillAreaParam.cubeWidth, 1, 1);
+                Trigers[1].LookAt(SkillAreaParam.deltaVec+transform.position,transform.up);
+                break;
+
         }
     }
   
@@ -146,6 +155,8 @@ public class SkillController : MonoBehaviour
                 {
                     EnemysInSkill.Add(col.gameObject);
                 }
+                break;
+            case SkillAreaType.OuterCircle_InnerCube:
                 break;
         }
     }
