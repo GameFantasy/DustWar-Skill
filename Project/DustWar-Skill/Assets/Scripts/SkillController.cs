@@ -9,6 +9,7 @@ public class SkillController : MonoBehaviour
 {
     bool isSkill = false;
 
+    public GameObject SkillCastObject;
     List<Transform> Trigers = new List<Transform>(); 
     List<GameObject> EnemysInSkill = new List<GameObject>();
     public SkillAreaType SkillType;
@@ -115,9 +116,15 @@ public class SkillController : MonoBehaviour
         {
             Debug.Log("技能击中了"+enemy.name);
         }
+        if (SkillType == SkillAreaType.OuterCircle_InnerCubeCast)
+        {
+            GameObject obj= Instantiate(SkillCastObject, transform.position, Quaternion.LookRotation(SkillAreaParam.deltaVec));
+            //obj.transform.LookAt(SkillAreaParam.deltaVec);
+        }
         Trigers[0].gameObject.SetActive(false);
         Trigers[1].gameObject.SetActive(false);
         EnemysInSkill.Clear();
+
     }
     void OnTriggerEnter(Collider col)
     {
@@ -126,7 +133,6 @@ public class SkillController : MonoBehaviour
         {
             EnemysInSkill.Add(col.gameObject);
         }
-
     }    
     void OnTriggerStay(Collider col)
     {

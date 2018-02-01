@@ -219,7 +219,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Assets\Scripts\EnemyCtrl.cs" />
     <Compile Include="Assets\Scripts\SkillArea.cs" />
+    <Compile Include="Assets\Scripts\SkillCast.cs" />
     <Compile Include="Assets\Scripts\SkillController.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -10,6 +10,7 @@ public enum SkillAreaType
     OuterCircle_InnerCube = 1,
     OuterCircle_InnerSector = 2,
     OuterCircle_InnerCircle = 3,
+    OuterCircle_InnerCubeCast = 4,
 }
 
 public class SkillArea : MonoBehaviour {
@@ -235,6 +236,11 @@ public class SkillArea : MonoBehaviour {
                 CreateElement(SKillAreaElement.OuterCircle);
                 CreateElement(SKillAreaElement.InnerCircle);
                 break;
+            case SkillAreaType.OuterCircle_InnerCubeCast:
+                CreateElement(SKillAreaElement.OuterCircle);
+                CreateElement(SKillAreaElement.Cube);
+                //HideElement(SKillAreaElement.OuterCircle);
+                break;
             default:
                 break;
         }
@@ -368,6 +374,9 @@ public class SkillArea : MonoBehaviour {
                 break;
             case SkillAreaType.OuterCircle_InnerCircle:
                 UpdateElementPosition(SKillAreaElement.InnerCircle);
+                break;
+            case SkillAreaType.OuterCircle_InnerCubeCast:
+                UpdateElementPosition(SKillAreaElement.Cube);
                 break;
             default:
                 break;
